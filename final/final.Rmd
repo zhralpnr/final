@@ -1,0 +1,185 @@
+---
+title: "Migrende Ağrı ile Risk Faktörleri Arasındaki İlişkinin Analizi"
+author: 
+  - Zehra Alpınar[^1]
+bibliography: ../bibliography/biblio.bib
+csl: ../csl/apa-tr.csl
+header-includes:
+  - \usepackage{polyglossia}
+  - \setmainlanguage{turkish}
+  - \usepackage{booktabs}
+  - \usepackage{caption} 
+  - \captionsetup[table]{skip=10pt}
+output:
+  bookdown::pdf_document2:
+    fig_caption: yes
+    fig_height: 3
+    fig_width: 4
+    keep_tex: no
+    latex_engine: xelatex
+    number_sections: yes
+    toc: no
+geometry: margin=1in
+link-citations: yes
+urlcolor: blue
+fontsize: 12pt
+biblio-style: apalike
+abstract: |
+ Migren dünyada giderek artan, hastanın günlük hayatını zorlaştıran ve özürlülüğe neden olabilen bir hastalıktır. Vücut kitle indeksi migreni etkileyen risk faktörlerinin başında gelmektedir. Aynı zamanda obezite hastaları vücut kitle indeksinin yüksekliği ile tanı almaktadırlar. Son yıllarda migren ve obezitenin birlikteliğini gösteren çalışmalar bulunmaktadır. Bu bağlamda bu veri analizi projesi migrenli hastalarda vücut kitle indeksinin atakların sıklığını ne derece etkilediğini araştırmak ve migrenin yoğunluğunun hastanın özürlülük seviyesini artırıp artırmadığını öğrenmek amacıyla gerçekleştirilmiştir. 
+ Analiz yapmak için  Ankara Yıldırım Beyazıt Üniversitesi Hastanesinin hastalarının verileri Harvard Dataverse’ten alınmıştır. Veri setinde 144 migren hastasına ait çeşitli bilgiler yer almaktadır. Veri temizliği ve uygun formata getirme işlemleri gerçekleştirilerek analize hazır hale getirilmiştir.
+ Çalışmada değişkenler arasındaki ilişkileri incelemek amacıyla kullanılan istatiksel yöntemler doğrusal regresyon ve korelasyon analizidir. Vücut kitle indeksi (bağımsız değişken) ile migren ataklarının sıklığı (bağımlı değişken) arasındaki ilişki için regresyon ve baş ağrısının yoğunluğu ile hastanın özür seviyesini gösteren ölçek olan MIDAS ( Migraine Disability Assessment Scale) arasındaki ilişkinin incelenmesi için Kendall tau korelasyon analizi yapılmıştır.
+ Doğrusal regresyon analizi sonucunda vücut kitle indeksi ile atakların sıklığı arasında pozitif bir ilişki olduğu sonucuna varılmıştır. (p-value < 0.05). Analiz anlamlıdır. Vücut kitle indeksi arttıkça migren ataklarının sıklığı da ona bağlı olarak artmaktadır. Korelasyon analizinin sonucunda ise baş ağrısının yoğunluğu ile özürlülük seviyesi (MIDAS) arasında anlamlı bir ilişki kurulamamıştır. (r = 0.1) . Korelasyon ilişkisi zayıftır.
+ Migren hastalarında atakların sıklığını azaltmak için zayıflamak ve dolayısıyla vücut kitle indeksini azaltmak etkili olabilir. Özürlülük seviyesinin (MIDAS) ise migrenin yoğunluğuyla bir ilişkisi olmadığı belirlenmiştir.
+  
+
+---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(cache = FALSE, echo = TRUE, message = FALSE, warning = FALSE)
+```
+
+<!-- ======================================================================= -->
+<!-- ============================== NOTLAR ================================= -->
+<!-- ======================================================================= -->
+[^1]: 21080531, [Github Repo](https://github.com/zhralpnr/final)
+
+
+# Giriş
+Çeşitli risk faktörlerinin migren üzerindeki etkilerinin, hastalığın yoğunluğunu ve sıklığını ne derecede etkilediği sorusunu açıklamak üzere bu analiz yapılacaktır. Analizde çeşitli migren hastalarından deney yoluyla elde edilen veri seti kullanılmıştır. Harvard Dataverse sisteminden alınan veri seti 144 gözlemden (migren hastaları) ve 13 değişkenden (yaş, cinsiyet, vücut kitle indeksi, çeşitli migren semptomları) oluşmaktadır.
+
+
+## Çalışmanın Amacı
+Türk Nöroloji Derneği’nin 2013 yılı verilerine göre Türkiye’de %16,7 oranında migren hastalığı görülmekte iken, 2022 yılı nüfus verileri kapsamında 15 milyona tekabül etmektedir. Ülkemizde ve dünyada giderek artış gösteren migren; hayat kalitesini düşüren ve bireylerin günlük işlerini yapmalarında dahi zorlanmalarına sebep olan bir rahatsızlıktır.
+
+Migren atakları şiddetli hissedilen baş ağrısının yanı sıra mide bulantısı, kusma, baş dönmesi, ışığa ve sese karşı duyarlılığın artması gibi semptomlarla birlikte seyreder. Bu belirtilerin şiddeti, yoğunluk ve atak sıklıkları çeşitli faktörlere göre değişiklik gösterir.Migreni etkileyen risk faktörlerinden çalışmada kullanılacak olanlar; yaş, cinsiyet, vücut kitle indeksi, alkol ve sigara kullanımıdır. Nihayetinde çalışmanın amacı migren hastalarının hissettikleri ağrının yoğunluğunun çeşitli risk faktörlerine bağlı olarak semptomlar üzerindeki etkilerinin analiz edilmesidir.
+
+## Literatür
+Migren binlerce yıldan beri bilinen bir hastalık olup nörolojik, gastrointestinal ve otonom değişikliklerin çeşitli kombinasyonlarda eşlik ettiği birincil, epizodik bir baş ağrısıdır.[@ozturan2016migren]
+
+Semptomları kişiden kişiye değişmekle birlikte bir ya da birden fazla şekilde görülebilir ve her zaman aynı şekilde olmaz. Aralıklı ve ilerleyici de olabilir. Tanısı genellikle hastanın hikayesine dayanılarak koyulabilmektedir. Migren kronik ve epizodik olarak ikiye ayrılır. Kronik migren (KM), en az üç ay boyunca ayda 15 gün veya daha fazla baş ağrısı ataklarının olması ve bunun 8 veya daha fazlasının migren kriterlerini karşılaması olarak tanımlanır.[@yalin2016phenotypic].Epizodik migren daha aralıklı ataklarla gelen migrendir. Kronik migrenden daha az ağrı atağının görülmesiyle ayrıştırılır.
+
+Migren yaşam kalitesini düşüren, iş verimliliğini azaltan ve özürlülüğe neden olabilen bir hastalıktır. Bu özürlülüğün ölçülebilmesi için Migraine Disability Assessment Scale (MIDAS) adında bir ölçek geliştirilmiştir. Elif Köksal ve diğerlerinin “Migrenli Kadınlarda Vücut Kitle İndeksinin Ağrı, Özürlülük ve Uyku Üzerine Etkileri” adlı çalışmasında migrenli kadınlar üzerinde MIDAS kullanılarak hastaların özürlülük seviyesi ölçülmüştür.Örneğin vücut kitle indeksi 25’ten daha yüksek olan migrenli kadınların ataklarının daha sık olduğu ve özürlülük derecesinin de arttığı  bulunmuştur.[@gokccal2015migrenli]
+
+ L. Kelman & D. Tanis’ in “The relationship between migraine pain and other associated symptoms” adlı makalesinde migren ağrısına eşlik eden semptomlar incelenmiştir. Buna göre migren atakları genellikle mide bulantısı ve diğer ilişkili semptomları içerir. Başlangıçta sadece ağrı meydana gelse de devamında ağrının yoğunluğu ve şiddetine göre migren semptomları çeşitlenir. Çalışmada ağrı ne kadar şiddetli olursa semptomların o kadar kötü olacağı iddia edilmektedir. Bununla birlikte bu çalışmada ağrının hem şiddeti hem de süresi ile kronik migren atağının ilişkili semptomları arasındaki ilişki kesin olarak kurulamamıştır. İlişkili tüm semptomların ağrı ile ilgili olarak aynı şekilde davranıp davranmadığı da bilinmemektedir.[@kelman2006relationship]
+ 
+İncelenen çalışmalardan migren ağrısının şiddetinin semptomlarla doğru yönde ilişkili olduğu anlaşılmıştır. Ancak bunun aksini iddia eden çalışmalar da bulunmaktadır. Kesin sonuçlar için detaylı analiz yapılması gerekmektedir.
+
+
+
+# Veri 
+Çalışmamızda kullanılan veri seti Harvard Dataverse sisteminden alınmıştır.
+Ham veri üzerinde analizin doğru ve kolay yapılabilmesi için temizlik yapılmıştır. Konudan uzak olan değişkenler de kaldırılmıştır. 
+
+Gözlemlerin içinde kadınlar 106 kişi ile çoğunluğu oluşturmaktadır (%74).
+Alkol kullanma oranı (%8.3) ve sigara kullanma oranı (%25)'tir bu da analizi yapılamayacak kadar azdır.
+
+```{r echo=FALSE}
+library(tidyverse)
+library(here)
+md <- readxl::read_xlsx("/Users/zhral/OneDrive/Masaüstü/finalll/final/data/migrainedataset.xlsx")
+```
+
+```{r, echo=FALSE}
+library(xtable) 
+# devtools::install_github("emraher/summarytools")
+library(summarytools)
+st_options(lang = "tr")
+```
+
+```{r, echo=FALSE}
+ch <- md %>%
+  select(Cinsiyet, `Alkol Kullanımı`, `Sigara Kullanımı`)
+gtsummary::tbl_summary(ch)
+```
+
+```{r results='asis', echo=FALSE}
+md %>%
+  select( "MIDAS skoru", "Atak süresi", "Mide Bulantısı", "Kusma", "Işığa duyarlılık", "Sese duyarlılık", "Baş Ağrısının Yoğunluğu", "Atakların Sıklığı", "Vücut Kitle İndeksi", "Yaş") %>% 
+  descr(stats = c("mean", "sd", "min", "med", "max"), transpose = TRUE) %>% 
+  xtable(caption = "Özet İstatistikler",
+         label = "tab:ozet",
+         align = c("l", "c", "c", "c", "c", "c")) %>% 
+  print(booktabs = TRUE, comment = FALSE, caption.placement = "top")
+```
+
+Hastaların yaşları 20 ile 55 arasında değişmektedir. Ortalama yaş 30.98'dir. Vücut kitle indeksleri 15.97 ile 37.11 arasındadır. Buna göre hem aşırı zayıf (vki < 18) hem de morbit obez (vki > 35) hastalar bulunmaktadır. Bu çeşitlilik analizin doğru yapılmasını kolaylaştıracaktır.
+Baş ağrısının yoğunluğu en az 5 en yüksek 10'dur. Ortalaması 7.84 olarak genel olarak yoğunluk yüksektir.Diğer değişkenlerin özet istatistikleri tabloda gösterilmiştir. (Tablo\ref{tab:ozet})
+
+
+
+
+
+
+# Yöntem ve Veri Analizi
+
+Analizimizde kullanılacak ve veri setimize uygun olan yöntemler doğrusal regresyon ve korelasyondur. Doğrusal regresyon analizinde Vücut kitle indeksinin az veya çok olmasının migren atak sıklığıyla ilişkisinin olup olmadığı ölçülecektir. Bağımsız değişken, vücut kitle indeksidir. Bağımlı değişken ise atakların sıklığıdır.
+$$
+Y_t = \beta_0 + \beta_I I_t + \varepsilon_t
+$$
+
+```{r echo=FALSE}
+data(md, package = "moderndive")
+
+rg <- md %>%
+  select(`Vücut Kitle İndeksi`, `Atakların Sıklığı`)
+
+```
+
+```{r plot, fig.align='center', fig.cap= "Regresyon Doğrusu", echo=FALSE}
+rg %>%
+  ggplot(aes(`Vücut Kitle İndeksi`, `Atakların Sıklığı`)) +
+  geom_point() +
+  geom_smooth(method = "lm")
+```
+ 
+ 
+```{r echo=FALSE}
+score_mod <- lm(`Atakların Sıklığı`~ `Vücut Kitle İndeksi`, data = rg)
+summary(score_mod)
+```
+```{r echo=FALSE}
+library(broom)
+tidy(score_mod)
+```
+
+P değeri 0.00996 olarak bulunmuştur. 0 hipotezi modelin anlamsız olduğudur. P değeri 0.05'ten küçük olduğu için (p-value<0.05) 0 hipotezi reddedilir. Modelimiz anlamlı bulunmuştur. Vücut kitle indeksi ile atakların sıklığı arasında anlamlı bir ilişki bulunmuştur.
+```{r echo=FALSE}
+equatiomatic::extract_eq(score_mod, use_coefs = TRUE)
+```
+Regresyon denklemine göre vücut kitle indeksi bir birim arttığında atakların sıklığı 0,25 kat artmaktadır.
+
+İkinci analizde baş ağrısının yoğunluğu ile MIDAS skoru arasında ilişki olup olmadığına bakılacaktır. Kendall korelasyonu yapılmıştır.
+```{r , echo=FALSE}
+cor.test(md$`Baş Ağrısının Yoğunluğu`,md$`MIDAS skoru`, method = "kendall")
+kor <- md
+library(ggpubr)
+ggscatter(md, x ="Baş Ağrısının Yoğunluğu", y = "MIDAS skoru",
+          add = "reg.line",
+          conf.int = TRUE,
+          cor.coef = TRUE,
+          cor.method = "kendall")
+
+```
+
+Baş ağrısının yoğunluğu ile MIDAS skoru arasında anlamlı bir ilişki bulunamamıştır. Korelasyon katsayısı 0'a yaklaştıkça iki değişken arasındaki ilişki zayıflar. Nötrdür. Analizimizde korelasyon katsayısı R= 0.1'dir. Bu iki değişken arasındaki ilişkinin zayıf olduğunu göstermektedir. 
+
+
+
+
+# Sonuç
+
+Doğrusal regresyon analizinin sonucunda vücut kitle indeksi ile atakların sıklığı arasında anlamlı bir ilişki olduğuna ulaşılmıştır. P değeri 0.00996 olarak bulunmuştur. P değeri 0.05'ten küçük olduğu için (p-value<0.05) 0 hipotezi reddedilir. Sonuç olarak regresyon anlamlıdır.  Vücut kitle indeksi arttıkça ona bağlı olarak atakların sıklığı artmaktadır. Grafikte de aralarında pozitif bir ilişki olduğu görülmektedir.(Şekil \@ref(fig:plot))
+
+Korelasyon analizinde ise baş ağrısının yoğunluğu ile MIDAS skoru arasında anlamlı bir ilişki yoktur. Analizimizde korelasyon katsayısı R= 0.1'dir. Bu iki değişken arasındaki ilişkinin nötr olduğunu göstermektedir. 
+
+Araştırmada ilk amacımız çeşitli risk faktörlerinin migrenin sıklığını ve yoğunluğunu nasıl etkilediğini analiz etmekti. Yapmış olduğumuz analiz araştırma sorumuzu büyük ölçüde cevaplamıştır. Çalışmada kullanılan risk faktörü vücut kitle indeksidir. Vücut kitle indeksinin migrenin sıklığını ne derece etkilediğini analizde hesaplanmıştır. Diğer risk faktörleri alkol ve sigara kullanımıdır. Fakat bu faktörlerin varlığı gözlemlerimizin içinde sayıca az oldukları için yapılan analiz doğru bir sonucu vermeyecektir. Bu sebeple analize dahil edilmediler. İkinci amacımız ağrının yoğunluğunun semptomları nasıl etkilediğiydi. Bu sebeple baş ağrısının yoğunluğu ile MIDAS (Migraine Disability Assessment Scale) skoru arasında bir ilişki olup olmadığı ölçülmüştür. 
+
+Bu çalışma ileride daha geniş çaplı ve detaylı analizler yapılarak geliştirilebilir. Her semptom için ayrı testler yapılabilir. Bir kaç semptomu (kusma, ışığa duyarlılık, sese duyarlılık vb.) aynı anda ilişkilendirerek çoklu analizler yapılabilir.
+
+
+
+
+
+\newpage
+# Kaynakça {#references}
+<div id="refs"></div>
+
